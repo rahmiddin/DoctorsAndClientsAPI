@@ -1,7 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
-
-from .models import User
+from .models import User, Appointment
 
 
 class UserSerializer(ModelSerializer):
@@ -9,4 +8,13 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'number', 'email', 'password')
+        fields = ('first_name', 'last_name', 'number', 'email', 'password')
+        write_only = 'password'
+
+
+class AppointmentSerializer(ModelSerializer):
+    """ Serializer for appointment model """
+    class Meta:
+        model = Appointment
+        fields = ('user', 'doctor', 'number', 'email', 'password')
+        write_only = 'password'
