@@ -27,7 +27,6 @@ class UserViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk: int = None):
         """ Get user with pk  """
         queryset = User.objects.filter(id=pk)
-        print(queryset)
         if queryset:
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data, status=200)
