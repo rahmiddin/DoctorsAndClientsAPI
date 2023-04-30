@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -163,3 +164,8 @@ SPECTACULAR_SETTINGS = {
 PHONENUMBER_DEFAULT_REGION = 'RU'
 PHONENUMBER_DEFAULT_FORMAT = 'NATIONAL'
 PHONENUMBER_DB_FORMAT = "NATIONAL"
+
+# JWT
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60)
+}

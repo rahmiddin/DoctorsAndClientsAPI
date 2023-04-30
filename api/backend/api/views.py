@@ -5,7 +5,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from phonenumber_field.validators import validate_international_phonenumber
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError as RestValidationError
-from rest_framework.generics import CreateAPIView
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
@@ -34,7 +34,6 @@ class UserViewSet(viewsets.ViewSet):
         else:
             return JsonResponse({'Status': False}, status=404)
 
-    @extend_schema(responses=UserSerializer)
     def create(self, request):
         """ Create user, validate password and phone number """
         serializer = UserSerializer(data=request.data)
@@ -63,7 +62,6 @@ class UserViewSet(viewsets.ViewSet):
         else:
             return JsonResponse({'Status': 'False', 'Error': 'required data not provided'})
 
-    @extend_schema(responses=UserSerializer)
     def partial_update(self, request, pk: int = None):
         """ Update current user"""
 
@@ -85,5 +83,14 @@ class UserViewSet(viewsets.ViewSet):
             return JsonResponse({'Status': False, 'Error': 'Forbidden'})
 
 
-class CreateAppointmentView(viewsets.ViewSet):
-    pass
+class AppointmentView(generics.ListCreateAPIView):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request, *args, **kwargs):
+        """ After saving the appointment, also save its price """
+        res = super(AppointmentView, self).post(request, *args, **kwargs)
+        appointment = Appointment.objects.get(id=res.data['id'])
+        appointment.save_price(int(request.data['service']))
+        return res

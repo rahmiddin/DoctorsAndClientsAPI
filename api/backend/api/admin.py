@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Doctor, Category, Appointment, User
+from .models import Doctor, Category, Appointment, User, Service
 # Register your models here.
 
 
@@ -19,14 +19,21 @@ class DoctorAdmin(admin.ModelAdmin):
 
 
 @admin.register(Category)
-class DoctorAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     class Meta:
         model = Category
         field = ('name', )
 
 
 @admin.register(Appointment)
-class DoctorAdmin(admin.ModelAdmin):
+class AppointmentAdmin(admin.ModelAdmin):
     class Meta:
         model = Appointment
         field = ('user', 'doctor', 'created_time', 'appointment_time', 'price', 'status')
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    class Meta:
+        model = Appointment
+        field = ('name', 'category')

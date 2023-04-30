@@ -4,6 +4,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy
 from phonenumber_field.modelfields import PhoneNumberField
 from datetime import datetime
+
+
 # Create your models here.
 
 
@@ -98,15 +100,9 @@ class Doctor(models.Model):
             return False
 
 
-APPOINTMENT_CHOICES = (
-    ('confirmed', 'Подтвержден'),
-    ('completed', 'Выполенен'),
-    ('canceled', 'Отменено')
-)
-
-
 class Service(models.Model):
     name = models.CharField(max_length=256)
+    price = models.PositiveIntegerField()
     category = models.ForeignKey(to=Category, on_delete=models.CASCADE,
                                  related_name='service_category')
 
@@ -130,15 +126,23 @@ class DoctorsService(models.Model):
         return f'{self.doctor} {self.service}'
 
 
+APPOINTMENT_CHOICES = (
+    ('confirmed', 'Подтвержден'),
+    ('canceled', 'Отменено')
+)
+
+
 class Appointment(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE,
                              related_name='appointment_client')
     doctor = models.ForeignKey(to=Doctor, on_delete=models.CASCADE,
                                related_name='appointment_doctor')
+    service = models.ForeignKey(to=Service, on_delete=models.CASCADE,
+                                related_name='appointment_service')
     created_time = models.DateTimeField(auto_now_add=True)
     appointment_time = models.DateTimeField()
-    price = models.PositiveIntegerField()
-    status = models.CharField(choices=APPOINTMENT_CHOICES, default='New', max_length=20)
+    price = models.PositiveIntegerField(null=True)
+    status = models.CharField(choices=APPOINTMENT_CHOICES, default='confirmed', max_length=20)
 
     class Meta:
         verbose_name = 'appointment'
@@ -146,3 +150,9 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f'Клиент {self.user} к доктору  {self.doctor} на {self.appointment_time}'
+
+    def save_price(self, service_id: int):
+        price = Service.objects.get(id=service_id).price
+        self.price = price
+        self.save()
+
